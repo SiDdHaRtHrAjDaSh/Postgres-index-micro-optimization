@@ -111,6 +111,40 @@ extern bool trace_syncscan;
 extern bool optimize_bounded_sort;
 #endif
 
+
+/* btree_leaf_prefetch: bool USERSET */
+DefineCustomBoolVariable(
+    "btree_leaf_prefetch",
+    "Enable leaf-page lookahead prefetch during B-Tree range scans.",
+    NULL,
+    &btree_leaf_prefetch,
+    false,
+    PGC_USERSET, 0,
+    NULL, NULL, NULL);
+
+/* btree_binsrch_linear: bool USERSET */
+DefineCustomBoolVariable(
+    "btree_binsrch_linear",
+    "Use linear search on very small B-Tree leaf pages.",
+    NULL,
+    &btree_binsrch_linear,
+    false,
+    PGC_USERSET, 0,
+    NULL, NULL, NULL);
+
+/* btree_binsrch_linear_threshold: int USERSET [1..32], default 4 */
+DefineCustomIntVariable(
+    "btree_binsrch_linear_threshold",
+    "Max leaf items for linear search fallback.",
+    NULL,
+    &btree_binsrch_linear_threshold,
+    4,   /* default */
+    1,   /* min */
+    32,  /* max */
+    PGC_USERSET, 0,
+    NULL, NULL, NULL);
+
+	
 /*
  * Options for enum values defined in this module.
  *

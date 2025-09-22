@@ -46,6 +46,11 @@ typedef struct BTScanKeyPreproc
 	int			arrayidx;
 } BTScanKeyPreproc;
 
+/* Defaults match GUC defaults */
+bool btree_leaf_prefetch = false;
+bool btree_binsrch_linear = false;
+int  btree_binsrch_linear_threshold = 4;
+
 static void _bt_setup_array_cmp(IndexScanDesc scan, ScanKey skey, Oid elemtype,
 								FmgrInfo *orderproc, FmgrInfo **sortprocp);
 static Datum _bt_find_extreme_element(IndexScanDesc scan, ScanKey skey,

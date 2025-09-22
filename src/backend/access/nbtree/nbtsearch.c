@@ -23,6 +23,8 @@
 #include "storage/predicate.h"
 #include "utils/lsyscache.h"
 #include "utils/rel.h"
+#include "storage/bufmgr.h"  /* PrefetchBuffer */
+#include "storage/smgr.h"    /* RelationGetSmgr */
 
 
 static void _bt_drop_lock_and_maybe_pin(IndexScanDesc scan, BTScanPos sp);
@@ -365,6 +367,35 @@ _bt_binsrch(Relation rel,
 	 */
 	if (unlikely(high < low))
 		return low;
+	
+	/* Linear-scan fast path for tiny leaf pages (GUC-controlled) */
+	if (btree_binsrch_linear && P_ISLEAF(opaque))
+	{
+		int nitems = (high >= low) ? (int)(high - low + 1) : 0;
+
+		/* Only when there are a few tuples: 2..threshold */
+		if (nitems >= 2 && nitems <= btree_binsrch_linear_threshold)
+		{
+			/* Mirror binary-search semantics using the same comparator */
+			int32 cmpval_local = key->nextkey ? 0 : 1;   /* 1: >=, 0: > */
+			OffsetNumber pos = low;
+
+			while (pos <= high)
+			{
+				result = _bt_compare(rel, key, page, pos);
+				if (result >= cmpval_local)
+					break;                  /* found first >= (or >) */
+				pos = OffsetNumberNext(pos);
+			}
+
+			/* On leaf pages, the standard return logic is: */
+			if (key->backward)
+				return OffsetNumberPrev(pos);   /* last < (or <=) */
+			else
+				return pos;                     /* first >= (or >) */
+		}
+	}
+	/* otherwise, fall through to the normal binary-search path */
 
 	/*
 	 * Binary search to find the first key on the page >= scan key, or first
@@ -1936,6 +1967,33 @@ _bt_readpage(IndexScanDesc scan, ScanDirection dir, OffsetNumber offnum,
 		so->currPos.lastItem = MaxTIDsPerBTreePage - 1;
 		so->currPos.itemIndex = MaxTIDsPerBTreePage - 1;
 	}
+
+		/* Leaf-page lookahead prefetch (GUC-controlled) */
+	if (btree_leaf_prefetch && P_ISLEAF(opaque))
+	{
+		BlockNumber sib = InvalidBlockNumber;
+
+		/*
+		* Only prefetch when the scan will actually continue in that direction.
+		* For forward scans we already latched nextPage earlier; for backward
+		* scans we can read prev from the current page's opaque.
+		*/
+		if (ScanDirectionIsForward(dir))
+		{
+			if (so->currPos.moreRight && !P_RIGHTMOST(opaque))
+				sib = so->currPos.nextPage;   /* same as opaque->btpo_next at page read */
+		}
+		else /* backward */
+		{
+			if (so->currPos.moreLeft && !P_LEFTMOST(opaque))
+				sib = opaque->btpo_prev;
+		}
+
+		/* Non-blocking hint to the buffer manager; safe even if stale after splits */
+		if (BlockNumberIsValid(sib))
+			PrefetchBuffer(RelationGetSmgr(scan->indexRelation), MAIN_FORKNUM, sib);
+	}
+
 
 	return (so->currPos.firstItem <= so->currPos.lastItem);
 }
