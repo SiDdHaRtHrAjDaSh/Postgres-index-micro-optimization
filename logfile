@@ -1,0 +1,59 @@
+2025-09-21 03:01:46.219 UTC [9106] LOG:  starting PostgreSQL 17.4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-09-21 03:01:46.219 UTC [9106] LOG:  listening on IPv6 address "::1", port 5432
+2025-09-21 03:01:46.220 UTC [9106] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-09-21 03:01:46.222 UTC [9106] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-09-21 03:01:46.226 UTC [9109] LOG:  database system was shut down at 2025-09-21 03:01:31 UTC
+2025-09-21 03:01:46.230 UTC [9106] LOG:  database system is ready to accept connections
+2025-09-21 03:01:55.929 UTC [9106] LOG:  received fast shutdown request
+2025-09-21 03:01:55.931 UTC [9106] LOG:  aborting any active transactions
+2025-09-21 03:01:55.932 UTC [9106] LOG:  background worker "logical replication launcher" (PID 9112) exited with exit code 1
+2025-09-21 03:01:55.932 UTC [9107] LOG:  shutting down
+2025-09-21 03:01:55.933 UTC [9107] LOG:  checkpoint starting: shutdown immediate
+2025-09-21 03:01:55.942 UTC [9107] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.010 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/14E1E40, redo lsn=0/14E1E40
+2025-09-21 03:01:55.945 UTC [9106] LOG:  database system is shut down
+2025-09-21 03:01:56.044 UTC [9114] LOG:  starting PostgreSQL 17.4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-09-21 03:01:56.044 UTC [9114] LOG:  listening on IPv6 address "::1", port 5432
+2025-09-21 03:01:56.044 UTC [9114] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-09-21 03:01:56.046 UTC [9114] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-09-21 03:01:56.050 UTC [9117] LOG:  database system was shut down at 2025-09-21 03:01:55 UTC
+2025-09-21 03:01:56.054 UTC [9114] LOG:  database system is ready to accept connections
+2025-09-21 03:02:02.553 UTC [9114] LOG:  received fast shutdown request
+2025-09-21 03:02:02.556 UTC [9114] LOG:  aborting any active transactions
+2025-09-21 03:02:02.556 UTC [9114] LOG:  background worker "logical replication launcher" (PID 9120) exited with exit code 1
+2025-09-21 03:02:02.557 UTC [9115] LOG:  shutting down
+2025-09-21 03:02:02.558 UTC [9115] LOG:  checkpoint starting: shutdown immediate
+2025-09-21 03:02:02.568 UTC [9115] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.012 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/14E1EB8, redo lsn=0/14E1EB8
+2025-09-21 03:02:02.571 UTC [9114] LOG:  database system is shut down
+2025-09-21 08:00:38.777 UTC [9136] LOG:  starting PostgreSQL 17.4 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-09-21 08:00:38.785 UTC [9136] LOG:  listening on IPv6 address "::1", port 5432
+2025-09-21 08:00:38.785 UTC [9136] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-09-21 08:00:38.791 UTC [9136] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-09-21 08:00:38.804 UTC [9139] LOG:  database system was shut down at 2025-09-21 03:02:02 UTC
+2025-09-21 08:00:38.821 UTC [9136] LOG:  database system is ready to accept connections
+2025-09-21 08:01:53.517 UTC [9154] FATAL:  database "imdbload" does not exist
+2025-09-21 08:02:45.450 UTC [9160] FATAL:  lock file "postmaster.pid" already exists
+2025-09-21 08:02:45.450 UTC [9160] HINT:  Is another postmaster (PID 9136) running in data directory "/home/siddharth/databases"?
+2025-09-21 08:05:38.889 UTC [9137] LOG:  checkpoint starting: time
+2025-09-21 08:07:15.990 UTC [9137] LOG:  checkpoint complete: wrote 973 buffers (5.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=97.031 s, sync=0.062 s, total=97.101 s; sync files=310, longest=0.004 s, average=0.001 s; distance=4513 kB, estimate=4513 kB; lsn=0/194A350, redo lsn=0/194A2C0
+2025-09-21 08:45:39.597 UTC [9137] LOG:  checkpoint starting: time
+2025-09-21 08:45:44.057 UTC [9137] LOG:  checkpoint complete: wrote 45 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.423 s, sync=0.024 s, total=4.461 s; sync files=37, longest=0.003 s, average=0.001 s; distance=164 kB, estimate=4078 kB; lsn=0/1973378, redo lsn=0/19732E8
+2025-09-22 09:26:56.289 UTC [54773] ERROR:  database "imdbload" already exists
+2025-09-22 09:26:56.289 UTC [54773] STATEMENT:  CREATE DATABASE imdbload;
+2025-09-22 09:27:43.881 UTC [55145] ERROR:  database "imdbload" is being accessed by other users
+2025-09-22 09:27:43.881 UTC [55145] DETAIL:  There are 2 other sessions using the database.
+2025-09-22 09:27:43.881 UTC [55145] STATEMENT:  DROP DATABASE imdbload;
+2025-09-22 09:27:59.692 UTC [55330] ERROR:  database "imdbload" already exists
+2025-09-22 09:27:59.692 UTC [55330] STATEMENT:  CREATE DATABASE imdbload;
+2025-09-22 09:28:08.423 UTC [55367] ERROR:  database "imdbload" is being accessed by other users
+2025-09-22 09:28:08.423 UTC [55367] DETAIL:  There is 1 other session using the database.
+2025-09-22 09:28:08.423 UTC [55367] STATEMENT:  DROP DATABASE imdbload;
+2025-09-22 09:29:06.496 UTC [44383] FATAL:  terminating connection due to administrator command
+2025-09-22 09:29:06.613 UTC [9137] LOG:  checkpoint starting: immediate force wait
+2025-09-22 09:29:06.630 UTC [9137] LOG:  checkpoint complete: wrote 1 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.002 s, total=0.017 s; sync files=1, longest=0.002 s, average=0.002 s; distance=1 kB, estimate=3670 kB; lsn=0/1973808, redo lsn=0/19737B0
+2025-09-22 09:29:17.676 UTC [9136] LOG:  received fast shutdown request
+2025-09-22 09:29:17.677 UTC [9136] LOG:  aborting any active transactions
+2025-09-22 09:29:17.681 UTC [9136] LOG:  background worker "logical replication launcher" (PID 9142) exited with exit code 1
+2025-09-22 09:29:17.681 UTC [9137] LOG:  shutting down
+2025-09-22 09:29:17.683 UTC [9137] LOG:  checkpoint starting: shutdown immediate
+2025-09-22 09:29:17.691 UTC [9137] LOG:  checkpoint complete: wrote 1 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.010 s; sync files=1, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=3303 kB; lsn=0/1973948, redo lsn=0/1973948
+2025-09-22 09:29:17.700 UTC [9136] LOG:  database system is shut down
