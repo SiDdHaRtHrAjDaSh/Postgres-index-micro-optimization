@@ -26,6 +26,8 @@
 #include <syslog.h>
 #endif
 
+#include "access/nbtree.h"
+
 #include "access/commit_ts.h"
 #include "access/gin.h"
 #include "access/slru.h"
@@ -112,39 +114,39 @@ extern bool optimize_bounded_sort;
 #endif
 
 
-/* btree_leaf_prefetch: bool USERSET */
-DefineCustomBoolVariable(
-    "btree_leaf_prefetch",
-    "Enable leaf-page lookahead prefetch during B-Tree range scans.",
-    NULL,
-    &btree_leaf_prefetch,
-    false,
-    PGC_USERSET, 0,
-    NULL, NULL, NULL);
+// /* btree_leaf_prefetch: bool USERSET */
+// DefineCustomBoolVariable(
+//     "btree_leaf_prefetch",
+//     "Enable leaf-page lookahead prefetch during B-Tree range scans.",
+//     NULL,
+//     &btree_leaf_prefetch,
+//     false,
+//     PGC_USERSET, 0,
+//     NULL, NULL, NULL);
 
-/* btree_binsrch_linear: bool USERSET */
-DefineCustomBoolVariable(
-    "btree_binsrch_linear",
-    "Use linear search on very small B-Tree leaf pages.",
-    NULL,
-    &btree_binsrch_linear,
-    false,
-    PGC_USERSET, 0,
-    NULL, NULL, NULL);
+// /* btree_binsrch_linear: bool USERSET */
+// DefineCustomBoolVariable(
+//     "btree_binsrch_linear",
+//     "Use linear search on very small B-Tree leaf pages.",
+//     NULL,
+//     &btree_binsrch_linear,
+//     false,
+//     PGC_USERSET, 0,
+//     NULL, NULL, NULL);
 
-/* btree_binsrch_linear_threshold: int USERSET [1..32], default 4 */
-DefineCustomIntVariable(
-    "btree_binsrch_linear_threshold",
-    "Max leaf items for linear search fallback.",
-    NULL,
-    &btree_binsrch_linear_threshold,
-    4,   /* default */
-    1,   /* min */
-    32,  /* max */
-    PGC_USERSET, 0,
-    NULL, NULL, NULL);
+// /* btree_binsrch_linear_threshold: int USERSET [1..32], default 4 */
+// DefineCustomIntVariable(
+//     "btree_binsrch_linear_threshold",
+//     "Max leaf items for linear search fallback.",
+//     NULL,
+//     &btree_binsrch_linear_threshold,
+//     4,   /* default */
+//     1,   /* min */
+//     32,  /* max */
+//     PGC_USERSET, 0,
+//     NULL, NULL, NULL);
 
-	
+
 /*
  * Options for enum values defined in this module.
  *
@@ -804,6 +806,26 @@ StaticAssertDecl(lengthof(config_type_names) == (PGC_ENUM + 1),
 
 struct config_bool ConfigureNamesBool[] =
 {
+	{
+		{"btree_leaf_prefetch", PGC_USERSET, QUERY_TUNING_METHOD,
+			gettext_noop("Enable leaf-page lookahead prefetch during B-Tree range scans."),
+			NULL,
+			0 /* or GUC_EXPLAIN if you want it shown in EXPLAIN settings */
+		},
+		&btree_leaf_prefetch,
+		false,          /* default */
+		NULL, NULL, NULL
+	},
+	{
+		{"btree_binsrch_linear", PGC_USERSET, QUERY_TUNING_METHOD,
+			gettext_noop("Use linear search on very small B-Tree leaf pages."),
+			NULL,
+			0 /* or GUC_EXPLAIN */
+		},
+		&btree_binsrch_linear,
+		false,          /* default */
+		NULL, NULL, NULL
+	},
 	{
 		{"enable_seqscan", PGC_USERSET, QUERY_TUNING_METHOD,
 			gettext_noop("Enables the planner's use of sequential-scan plans."),
@@ -2069,6 +2091,18 @@ struct config_bool ConfigureNamesBool[] =
 
 struct config_int ConfigureNamesInt[] =
 {
+	{
+		{"btree_binsrch_linear_threshold", PGC_USERSET, QUERY_TUNING_METHOD,
+			gettext_noop("Max leaf items for linear search fallback."),
+			NULL,
+			0
+		},
+		&btree_binsrch_linear_threshold,
+		4,   /* default */
+		1,   /* min */
+		32,  /* max */
+		NULL, NULL, NULL
+	},
 	{
 		{"archive_timeout", PGC_SIGHUP, WAL_ARCHIVING,
 			gettext_noop("Sets the amount of time to wait before forcing a "

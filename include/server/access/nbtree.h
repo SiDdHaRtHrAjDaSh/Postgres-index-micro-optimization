@@ -1328,7 +1328,6 @@ extern void btadjustmembers(Oid opfamilyoid,
 extern IndexBuildResult *btbuild(Relation heap, Relation index,
 								 struct IndexInfo *indexInfo);
 extern void _bt_parallel_build_main(dsm_segment *seg, shm_toc *toc);
-
 /* Experimental GUCs for project */
 extern bool btree_leaf_prefetch;
 extern bool btree_binsrch_linear;
