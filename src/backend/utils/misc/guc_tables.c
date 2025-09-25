@@ -112,41 +112,6 @@ extern bool trace_syncscan;
 #ifdef DEBUG_BOUNDED_SORT
 extern bool optimize_bounded_sort;
 #endif
-
-
-// /* btree_leaf_prefetch: bool USERSET */
-// DefineCustomBoolVariable(
-//     "btree_leaf_prefetch",
-//     "Enable leaf-page lookahead prefetch during B-Tree range scans.",
-//     NULL,
-//     &btree_leaf_prefetch,
-//     false,
-//     PGC_USERSET, 0,
-//     NULL, NULL, NULL);
-
-// /* btree_binsrch_linear: bool USERSET */
-// DefineCustomBoolVariable(
-//     "btree_binsrch_linear",
-//     "Use linear search on very small B-Tree leaf pages.",
-//     NULL,
-//     &btree_binsrch_linear,
-//     false,
-//     PGC_USERSET, 0,
-//     NULL, NULL, NULL);
-
-// /* btree_binsrch_linear_threshold: int USERSET [1..32], default 4 */
-// DefineCustomIntVariable(
-//     "btree_binsrch_linear_threshold",
-//     "Max leaf items for linear search fallback.",
-//     NULL,
-//     &btree_binsrch_linear_threshold,
-//     4,   /* default */
-//     1,   /* min */
-//     32,  /* max */
-//     PGC_USERSET, 0,
-//     NULL, NULL, NULL);
-
-
 /*
  * Options for enum values defined in this module.
  *
@@ -809,8 +774,7 @@ struct config_bool ConfigureNamesBool[] =
 	{
 		{"btree_leaf_prefetch", PGC_USERSET, QUERY_TUNING_METHOD,
 			gettext_noop("Enable leaf-page lookahead prefetch during B-Tree range scans."),
-			NULL,
-			0 /* or GUC_EXPLAIN if you want it shown in EXPLAIN settings */
+			NULL
 		},
 		&btree_leaf_prefetch,
 		false,          /* default */
@@ -819,8 +783,7 @@ struct config_bool ConfigureNamesBool[] =
 	{
 		{"btree_binsrch_linear", PGC_USERSET, QUERY_TUNING_METHOD,
 			gettext_noop("Use linear search on very small B-Tree leaf pages."),
-			NULL,
-			0 /* or GUC_EXPLAIN */
+			NULL
 		},
 		&btree_binsrch_linear,
 		false,          /* default */
@@ -2094,13 +2057,12 @@ struct config_int ConfigureNamesInt[] =
 	{
 		{"btree_binsrch_linear_threshold", PGC_USERSET, QUERY_TUNING_METHOD,
 			gettext_noop("Max leaf items for linear search fallback."),
-			NULL,
-			0
+			NULL
 		},
 		&btree_binsrch_linear_threshold,
 		4,   /* default */
 		1,   /* min */
-		32,  /* max */
+		8,  /* max */
 		NULL, NULL, NULL
 	},
 	{

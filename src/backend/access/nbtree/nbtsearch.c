@@ -371,28 +371,35 @@ _bt_binsrch(Relation rel,
 	/* Linear-scan fast path for tiny leaf pages (GUC-controlled) */
 	if (btree_binsrch_linear && P_ISLEAF(opaque))
 	{
-		int nitems = (high >= low) ? (int)(high - low + 1) : 0;
-
-		/* Only when there are a few tuples: 2..threshold */
-		if (nitems >= 2 && nitems <= btree_binsrch_linear_threshold)
+		OffsetNumber maxoff = PageGetMaxOffsetNumber(page);
+		OffsetNumber minoff = P_FIRSTDATAKEY(opaque);
+		int nitems;
+		
+		/* Safety check: ensure minoff is valid */
+		if (minoff <= maxoff)
 		{
-			/* Mirror binary-search semantics using the same comparator */
-			int32 cmpval_local = key->nextkey ? 0 : 1;   /* 1: >=, 0: > */
-			OffsetNumber pos = low;
-
-			while (pos <= high)
+			nitems = maxoff - minoff + 1;
+			
+			/* Guard: items in [2, threshold] range AND reasonable threshold */
+			if (nitems >= 2 && 
+				nitems <= btree_binsrch_linear_threshold &&
+				btree_binsrch_linear_threshold <= 8)  /* Conservative max */
 			{
-				result = _bt_compare(rel, key, page, pos);
-				if (result >= cmpval_local)
-					break;                  /* found first >= (or >) */
-				pos = OffsetNumberNext(pos);
+				OffsetNumber off;
+				int32 result;
+				
+				/* Perform minimal, ordered linear scan with bounds check */
+				for (off = minoff; off <= maxoff && off <= minoff + 8; off++)
+				{
+					result = _bt_compare(rel, key, page, off);
+					
+					if (result <= 0)
+						return off;
+				}
+				
+				/* Ensure we return a valid position */
+				return (maxoff < BLCKSZ) ? maxoff + 1 : maxoff;
 			}
-
-			/* On leaf pages, the standard return logic is: */
-			if (key->backward)
-				return OffsetNumberPrev(pos);   /* last < (or <=) */
-			else
-				return pos;                     /* first >= (or >) */
 		}
 	}
 	/* otherwise, fall through to the normal binary-search path */
@@ -1968,32 +1975,30 @@ _bt_readpage(IndexScanDesc scan, ScanDirection dir, OffsetNumber offnum,
 		so->currPos.itemIndex = MaxTIDsPerBTreePage - 1;
 	}
 
-		/* Leaf-page lookahead prefetch (GUC-controlled) */
+	/* Leaf-page lookahead prefetch (GUC-controlled) */
 	if (btree_leaf_prefetch && P_ISLEAF(opaque))
 	{
-		BlockNumber sib = InvalidBlockNumber;
-
-		/*
-		* Only prefetch when the scan will actually continue in that direction.
-		* For forward scans we already latched nextPage earlier; for backward
-		* scans we can read prev from the current page's opaque.
-		*/
-		if (ScanDirectionIsForward(dir))
+		BTScanOpaque so = (BTScanOpaque) scan->opaque;
+		BlockNumber nextblkno = InvalidBlockNumber;
+		
+		/* More conservative conditions - only prefetch when scan likely continues */
+		if ((ScanDirectionIsForward(dir) && so->currPos.moreRight) ||
+			(ScanDirectionIsBackward(dir) && so->currPos.moreLeft))
 		{
-			if (so->currPos.moreRight && !P_RIGHTMOST(opaque))
-				sib = so->currPos.nextPage;   /* same as opaque->btpo_next at page read */
-		}
-		else /* backward */
-		{
-			if (so->currPos.moreLeft && !P_LEFTMOST(opaque))
-				sib = opaque->btpo_prev;
+			/* Use page opaque's sibling pointers */
+			if (ScanDirectionIsForward(dir))
+				nextblkno = opaque->btpo_next;
+			else 
+				nextblkno = opaque->btpo_prev;
+			
+			/* Only prefetch if valid and not special marker */
+			if (BlockNumberIsValid(nextblkno) && nextblkno != P_NONE)
+			{
+				PrefetchBuffer(scan->indexRelation, MAIN_FORKNUM, nextblkno);
+			}
 		}
 
-		/* Non-blocking hint to the buffer manager; safe even if stale after splits */
-		if (BlockNumberIsValid(sib))
-			PrefetchBuffer(RelationGetSmgr(scan->indexRelation), MAIN_FORKNUM, sib);
 	}
-
 
 	return (so->currPos.firstItem <= so->currPos.lastItem);
 }
